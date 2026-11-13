@@ -1,0 +1,87 @@
+@startuml
+' Variante du diagramme de classes : organisation horizontale et classes typées
+left to right direction
+skinparam backgroundColor #F3F6FA
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam roundcorner 14
+skinparam class {
+  BackgroundColor white
+  BorderColor #087E8B
+  ArrowColor #526579
+  FontColor #182433
+}
+skinparam packageStyle rectangle
+
+title Agence de voyages — Diagramme de classes (variante)
+
+class TravelAgency << contrôle >> {
+  - passengers : collection<Passenger>
+  - flights : collection<Flight>
+  - reservations : collection<Reservation>
+  - payments : collection<Payment>
+  + addPassenger()
+  + addFlight()
+  + searchFlight()
+  + reserve()
+  + pay()
+  + cancel()
+  + listReservations()
+}
+
+class Passenger << entité >> {
+  - id : int
+  - name : string
+  - phone : string
+  - email : string
+  - passport : string
+}
+
+class Flight << entité >> {
+  - id : int
+  - code : string
+  - origin : string
+  - destination : string
+  - departure : string
+  - capacity : int
+  - price : double
+  - active : bool
+}
+
+class Reservation << entité >> {
+  - id : int
+  - passengerId : int
+  - flightId : int
+  - status : ReservationStatus
+  - createdAt : string
+  - paidAt : optional<string>
+  + confirm()
+  + cancel()
+}
+
+class Payment << entité >> {
+  - reservationId : int
+  - amount : double
+  - method : string
+  - paidAt : string
+}
+
+enum ReservationStatus {
+  EnAttente
+  Confirmee
+  Annulee
+}
+
+TravelAgency "1" o-- "0..*" Passenger : gère
+TravelAgency "1" o-- "0..*" Flight : propose
+TravelAgency "1" o-- "0..*" Reservation : suit
+Passenger "1" -- "0..*" Reservation : effectue
+Flight "1" -- "0..*" Reservation : concerne
+Reservation "1" -- "0..1" Payment : est réglée par
+Reservation ..> ReservationStatus : possède
+
+note bottom of Reservation
+  La réservation est confirmée après paiement.
+  Une annulation libère la place.
+end note
+@enduml
